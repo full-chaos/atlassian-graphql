@@ -35,6 +35,7 @@ class GraphQLClient:
         enable_local_throttling: bool = False,
         sleeper: Callable[[float], None] | None = None,
         time_provider: Callable[[], datetime] | None = None,
+        http_client: httpx.Client | None = None,
     ):
         if not base_url:
             raise ValueError("base_url is required")
@@ -48,7 +49,8 @@ class GraphQLClient:
         self.enable_local_throttling = enable_local_throttling
         self._logger = get_logger(logger)
         self._graphql_url = f"{self.base_url}/graphql"
-        self._client = httpx.Client(timeout=timeout_seconds)
+        self._owns_client = http_client is None
+        self._client = http_client if http_client is not None else httpx.Client(timeout=timeout_seconds)
         self._sleeper = sleeper if sleeper is not None else time.sleep
         self._now = (
             time_provider
@@ -267,7 +269,8 @@ class GraphQLClient:
                 response.close()
 
     def close(self) -> None:
-        self._client.close()
+        if self._owns_client:
+            self._client.close()
 
     def __enter__(self) -> "GraphQLClient":
         return self
