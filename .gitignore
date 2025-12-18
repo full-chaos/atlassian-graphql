@@ -14,7 +14,16 @@ __pycache__/
 
 # Go
 go/.gocache/
+go/.gopath/
+go/.cache/
 bin/
+
+# Generated GraphQL schema
+graphql/schema.introspection.json
+graphql/schema.sdl.graphql
+
+# Generated Jira REST OpenAPI
+openapi/jira-rest.swagger-v3.json
 
 # Env / tooling
 .python-version

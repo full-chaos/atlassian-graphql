@@ -32,6 +32,28 @@ func TestBearerAuthHeaderSet(t *testing.T) {
 	}
 }
 
+func TestBearerAuthStripsBearerPrefix(t *testing.T) {
+	var authHeader string
+
+	client := graphql.Client{
+		BaseURL: "http://example",
+		Auth: graphql.BearerAuth{
+			TokenGetter: func() (string, error) { return "Bearer token123", nil },
+		},
+		HTTPClient: newHTTPClient(func(req *http.Request) *http.Response {
+			authHeader = req.Header.Get("Authorization")
+			return jsonResponse(req, http.StatusOK, `{"data":{}}`, nil)
+		}),
+	}
+	_, err := client.Execute(context.Background(), "query { ok }", nil, "", nil, 1)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if authHeader != "Bearer token123" {
+		t.Fatalf("unexpected auth header %q", authHeader)
+	}
+}
+
 func TestBasicAuthHeader(t *testing.T) {
 	var authHeader string
 

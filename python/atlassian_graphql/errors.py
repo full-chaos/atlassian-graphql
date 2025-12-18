@@ -63,8 +63,22 @@ class GraphQLOperationError(Exception):
         errors: List[GraphQLErrorItem],
         partial_data: Optional[Any] = None,
     ):
-        first = errors[0].message if errors else "GraphQL operation failed"
-        super().__init__(first)
+        message = "GraphQL operation failed"
+        if errors:
+            first = errors[0]
+            message = first.message
+            if first.path:
+                message = f"{message}; path={first.path}"
+            if isinstance(first.extensions, dict):
+                required_scopes = (
+                    first.extensions.get("requiredScopes")
+                    or first.extensions.get("required_scopes")
+                    or first.extensions.get("required_scopes_any")
+                    or first.extensions.get("required_scopes_all")
+                )
+                if required_scopes:
+                    message = f"{message}; required_scopes={required_scopes}"
+        super().__init__(message)
         self.errors = errors
         self.partial_data = partial_data
 

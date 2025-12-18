@@ -71,6 +71,15 @@ func (e *GraphQLOperationError) Error() string {
 		builder.WriteString(" path=")
 		builder.WriteString(fmt.Sprint(first.Path))
 	}
+	if first.Extensions != nil {
+		for _, key := range []string{"requiredScopes", "required_scopes", "required_scopes_any", "required_scopes_all"} {
+			if val, ok := first.Extensions[key]; ok && val != nil {
+				builder.WriteString(" required_scopes=")
+				builder.WriteString(fmt.Sprint(val))
+				break
+			}
+		}
+	}
 	return builder.String()
 }
 

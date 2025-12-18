@@ -23,6 +23,11 @@ class OAuthBearerAuth:
         token = self._token_getter()
         if not token:
             raise ValueError("OAuth token getter returned empty token")
+        token = token.strip()
+        if token.lower().startswith("bearer "):
+            token = token.split(" ", 1)[1].strip()
+        if not token:
+            raise ValueError("OAuth token getter returned empty token")
         headers["Authorization"] = f"Bearer {token}"
 
     def get_cookies(self) -> Optional[Dict[str, str]]:

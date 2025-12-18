@@ -19,11 +19,23 @@ const defaultTimeout = 30 * time.Second
 const defaultRetries429 = 2
 const defaultMaxWait = 60 * time.Second
 
+func buildGraphQLURL(baseURL string) (string, error) {
+	trimmed := strings.TrimRight(strings.TrimSpace(baseURL), "/")
+	if trimmed == "" {
+		return "", errors.New("BaseURL is required")
+	}
+	if strings.HasSuffix(trimmed, "/graphql") {
+		return trimmed, nil
+	}
+	return trimmed + "/graphql", nil
+}
+
 type Client struct {
 	BaseURL               string
 	HTTPClient            *http.Client
 	Auth                  AuthProvider
 	Strict                bool
+	ExperimentalAPIs      []string
 	Logger                *slog.Logger
 	MaxRetries429         int
 	MaxWait               time.Duration
@@ -39,8 +51,9 @@ func (c *Client) Execute(ctx context.Context, query string, variables map[string
 	if strings.TrimSpace(query) == "" {
 		return nil, errors.New("query must be provided")
 	}
-	if strings.TrimSpace(c.BaseURL) == "" {
-		return nil, errors.New("BaseURL is required")
+	graphQLURL, err := buildGraphQLURL(c.BaseURL)
+	if err != nil {
+		return nil, err
 	}
 
 	httpClient := c.HTTPClient
@@ -93,8 +106,6 @@ func (c *Client) Execute(ctx context.Context, query string, variables map[string
 	if err != nil {
 		return nil, fmt.Errorf("marshal request: %w", err)
 	}
-
-	graphQLURL := strings.TrimRight(c.BaseURL, "/") + "/graphql"
 
 	attempt := 0
 	for {

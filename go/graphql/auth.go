@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 type AuthProvider interface {
@@ -21,6 +22,10 @@ func (a BearerAuth) Apply(req *http.Request) error {
 	token, err := a.TokenGetter()
 	if err != nil {
 		return fmt.Errorf("get token: %w", err)
+	}
+	token = strings.TrimSpace(token)
+	if strings.HasPrefix(strings.ToLower(token), "bearer ") {
+		token = strings.TrimSpace(token[len("bearer "):])
 	}
 	if token == "" {
 		return errors.New("empty bearer token")

@@ -48,7 +48,11 @@ class GraphQLClient:
         self.max_wait_seconds = max(0, max_wait_seconds)
         self.enable_local_throttling = enable_local_throttling
         self._logger = get_logger(logger)
-        self._graphql_url = f"{self.base_url}/graphql"
+        self._graphql_url = (
+            self.base_url
+            if self.base_url.endswith("/graphql")
+            else f"{self.base_url}/graphql"
+        )
         self._owns_client = http_client is None
         self._client = http_client if http_client is not None else httpx.Client(timeout=timeout_seconds)
         self._sleeper = sleeper if sleeper is not None else time.sleep

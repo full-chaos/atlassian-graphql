@@ -18,13 +18,21 @@ import (
 )
 
 func TestLiveSmoke(t *testing.T) {
+	loadDotEnvIfPresent(t)
+
 	baseURL := os.Getenv("ATLASSIAN_GQL_BASE_URL")
-	if baseURL == "" {
-		t.Skip("ATLASSIAN_GQL_BASE_URL not set")
+	if baseURL == "" && strings.TrimSpace(os.Getenv("ATLASSIAN_OAUTH_ACCESS_TOKEN")) != "" {
+		baseURL = "https://api.atlassian.com"
+	}
+	if baseURL == "" && strings.TrimSpace(os.Getenv("ATLASSIAN_OAUTH_REFRESH_TOKEN")) != "" {
+		baseURL = "https://api.atlassian.com"
 	}
 	auth := buildAuth(t)
 	if auth == nil {
 		t.Skip("no credentials available")
+	}
+	if baseURL == "" {
+		t.Skip("ATLASSIAN_GQL_BASE_URL not set (required for non-OAuth auth modes)")
 	}
 
 	buf := &bytes.Buffer{}
@@ -68,11 +76,25 @@ func TestLiveSmoke(t *testing.T) {
 
 func buildAuth(t *testing.T) graphql.AuthProvider {
 	token := os.Getenv("ATLASSIAN_OAUTH_ACCESS_TOKEN")
+	refreshToken := os.Getenv("ATLASSIAN_OAUTH_REFRESH_TOKEN")
+	clientID := os.Getenv("ATLASSIAN_CLIENT_ID")
 	email := os.Getenv("ATLASSIAN_EMAIL")
 	apiToken := os.Getenv("ATLASSIAN_API_TOKEN")
 	cookiesJSON := os.Getenv("ATLASSIAN_COOKIES_JSON")
+	clientSecret := os.Getenv("ATLASSIAN_CLIENT_SECRET")
 
+	if strings.TrimSpace(refreshToken) != "" && strings.TrimSpace(clientID) != "" && strings.TrimSpace(clientSecret) != "" {
+		return &graphql.OAuthRefreshTokenAuth{
+			ClientID:     clientID,
+			ClientSecret: clientSecret,
+			RefreshToken: refreshToken,
+			Timeout:      30 * time.Second,
+		}
+	}
 	if token != "" {
+		if clientSecret != "" && strings.TrimSpace(token) == strings.TrimSpace(clientSecret) {
+			t.Fatal("ATLASSIAN_OAUTH_ACCESS_TOKEN appears to be set to ATLASSIAN_CLIENT_SECRET; set an OAuth access token (not the client secret)")
+		}
 		return graphql.BearerAuth{
 			TokenGetter: func() (string, error) { return token, nil },
 		}
