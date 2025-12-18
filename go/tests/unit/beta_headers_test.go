@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"atlassian-graphql/atlassian/graph"
+	"atlassian/atlassian/graph"
 )
 
 func TestExperimentalHeadersRepeated(t *testing.T) {

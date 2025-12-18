@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"atlassian-graphql/atlassian/rest"
+	"atlassian/atlassian/rest"
 )
 
 func TestJiraRESTProjectsPaginationAndFiltering(t *testing.T) {

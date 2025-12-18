@@ -12,7 +12,7 @@ import (
 
 	"log/slog"
 
-	"atlassian-graphql/atlassian"
+	"atlassian/atlassian"
 )
 
 const defaultTimeout = 30 * time.Second

@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"atlassian-graphql/atlassian"
-	"atlassian-graphql/atlassian/graph"
+	"atlassian/atlassian"
+	"atlassian/atlassian/graph"
 )
 
 type config struct {

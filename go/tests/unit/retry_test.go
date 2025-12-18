@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"atlassian-graphql/atlassian"
-	"atlassian-graphql/atlassian/graph"
+	"atlassian/atlassian"
+	"atlassian/atlassian/graph"
 )
 
 func TestRetryOn429TimestampHeader(t *testing.T) {

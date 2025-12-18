@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"atlassian-graphql/atlassian"
-	"atlassian-graphql/atlassian/rest"
+	"atlassian/atlassian"
+	"atlassian/atlassian/rest"
 	"log/slog"
 )
 

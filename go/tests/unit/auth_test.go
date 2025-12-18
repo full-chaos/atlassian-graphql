@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"atlassian-graphql/atlassian"
-	"atlassian-graphql/atlassian/graph"
+	"atlassian/atlassian"
+	"atlassian/atlassian/graph"
 )
 
 func TestBearerAuthHeaderSet(t *testing.T) {

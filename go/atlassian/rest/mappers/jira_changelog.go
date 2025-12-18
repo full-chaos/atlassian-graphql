@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"atlassian-graphql/atlassian"
-	"atlassian-graphql/atlassian/rest/gen"
+	"atlassian/atlassian"
+	"atlassian/atlassian/rest/gen"
 )
 
 func JiraChangelogEventFromREST(issueKey string, changelog gen.Changelog) (atlassian.JiraChangelogEvent, error) {

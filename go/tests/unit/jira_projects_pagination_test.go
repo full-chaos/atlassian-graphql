@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"testing"
 
-	"atlassian-graphql/atlassian/graph"
-	"atlassian-graphql/atlassian/graph/gen"
+	"atlassian/atlassian/graph"
+	"atlassian/atlassian/graph/gen"
 )
 
 func TestJiraProjectsPaginationOuterAndNested(t *testing.T) {

@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"strings"
 
-	"atlassian-graphql/atlassian"
-	"atlassian-graphql/atlassian/graph/gen"
-	"atlassian-graphql/atlassian/graph/mappers"
+	"atlassian/atlassian"
+	"atlassian/atlassian/graph/gen"
+	"atlassian/atlassian/graph/mappers"
 )
 
 func (c *Client) ListProjectsWithOpsgenieLinkableTeams(ctx context.Context, cloudID string, projectTypes []string, pageSize int) ([]atlassian.CanonicalProjectWithOpsgenieTeams, error) {

@@ -34,7 +34,7 @@ Jira Cloud publishes a Swagger/OpenAPI spec for REST v3. You can fetch it into t
 - Jira REST (OAuth2 3LO): `https://api.atlassian.com/ex/jira/{cloudId}/rest/api/3/...`
 - Jira REST (tenanted): `https://{subdomain}.atlassian.net/rest/api/3/...`
 
-See the transport spec in `openapi/atlassian-graphql.transport.openapi.yaml`.
+See the transport spec in `openapi/atlassian.transport.openapi.yaml`.
 Canonical analytics schemas live in `openapi/jira-developer-health.canonical.openapi.yaml`.
 
 ## Getting an OAuth access token (3LO)
@@ -115,9 +115,9 @@ projects = list(list_projects_via_rest("YOUR_CLOUD_ID", ["SOFTWARE"]))
 ```go
 import (
     "context"
-    "atlassian-graphql/atlassian"
-    "atlassian-graphql/atlassian/graph"
-    "atlassian-graphql/atlassian/rest"
+    "atlassian/atlassian"
+    "atlassian/atlassian/graph"
+    "atlassian/atlassian/rest"
 )
 
 client := graph.Client{

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"atlassian-graphql/atlassian"
-	"atlassian-graphql/atlassian/rest/gen"
+	"atlassian/atlassian"
+	"atlassian/atlassian/rest/gen"
 )
 
 func requireNonEmptyString(value string, path string) (string, error) {

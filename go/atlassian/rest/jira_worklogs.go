@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"atlassian-graphql/atlassian"
-	"atlassian-graphql/atlassian/rest/gen"
-	"atlassian-graphql/atlassian/rest/mappers"
+	"atlassian/atlassian"
+	"atlassian/atlassian/rest/gen"
+	"atlassian/atlassian/rest/mappers"
 )
 
 func (c *JiraRESTClient) ListIssueWorklogsViaREST(ctx context.Context, issueKey string, pageSize int) ([]atlassian.JiraWorklog, error) {

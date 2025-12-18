@@ -4,8 +4,8 @@ import (
 	"errors"
 	"strings"
 
-	"atlassian-graphql/atlassian"
-	"atlassian-graphql/atlassian/rest/gen"
+	"atlassian/atlassian"
+	"atlassian/atlassian/rest/gen"
 )
 
 func JiraWorklogFromREST(issueKey string, worklog gen.Worklog) (atlassian.JiraWorklog, error) {

@@ -12,7 +12,7 @@ import (
 
 	"log/slog"
 
-	"atlassian-graphql/atlassian"
+	"atlassian/atlassian"
 )
 
 const introspectionQuery = `

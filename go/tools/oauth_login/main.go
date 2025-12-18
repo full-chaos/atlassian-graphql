@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"atlassian-graphql/atlassian"
+	"atlassian/atlassian"
 )
 
 func main() {

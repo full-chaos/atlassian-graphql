@@ -3,8 +3,8 @@ package unit
 import (
 	"testing"
 
-	"atlassian-graphql/atlassian/graph/gen"
-	"atlassian-graphql/atlassian/graph/mappers"
+	"atlassian/atlassian/graph/gen"
+	"atlassian/atlassian/graph/mappers"
 )
 
 func TestJiraProjectsMapperTrimsAndDedups(t *testing.T) {

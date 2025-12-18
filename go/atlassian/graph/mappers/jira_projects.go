@@ -4,8 +4,8 @@ import (
 	"errors"
 	"strings"
 
-	"atlassian-graphql/atlassian"
-	"atlassian-graphql/atlassian/graph/gen"
+	"atlassian/atlassian"
+	"atlassian/atlassian/graph/gen"
 )
 
 func ProjectWithOpsgenieTeams(cloudID string, project gen.JiraProjectNode, teams []gen.OpsgenieTeamNode) (atlassian.CanonicalProjectWithOpsgenieTeams, error) {

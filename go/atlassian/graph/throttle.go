@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"atlassian-graphql/atlassian"
+	"atlassian/atlassian"
 )
 
 type tokenBucket struct {

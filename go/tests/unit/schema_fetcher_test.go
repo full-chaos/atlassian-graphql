@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"atlassian-graphql/atlassian/graph"
+	"atlassian/atlassian/graph"
 )
 
 func TestSchemaFetcherWritesIntrospectionJSON(t *testing.T) {

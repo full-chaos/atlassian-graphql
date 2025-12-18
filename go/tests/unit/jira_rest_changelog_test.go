@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"atlassian-graphql/atlassian/rest"
+	"atlassian/atlassian/rest"
 )
 
 func TestJiraRESTChangelogPaginationAndMapping(t *testing.T) {

@@ -13,10 +13,10 @@ import (
 
 	"log/slog"
 
-	"atlassian-graphql/atlassian"
+	"atlassian/atlassian"
 )
 
-const defaultUserAgent = "atlassian-graphql-go/0.1.0"
+const defaultUserAgent = "atlassian-go/0.1.0"
 const defaultTimeout = 30 * time.Second
 const defaultRetries429 = 2
 const defaultMaxWait = 60 * time.Second

@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"atlassian-graphql/atlassian"
-	"atlassian-graphql/atlassian/rest/gen"
-	"atlassian-graphql/atlassian/rest/mappers"
+	"atlassian/atlassian"
+	"atlassian/atlassian/rest/gen"
+	"atlassian/atlassian/rest/mappers"
 )
 
 func normalizeProjectTypeFilter(values []string) ([]string, error) {
