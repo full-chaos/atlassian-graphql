@@ -4,40 +4,40 @@ import (
 	"errors"
 	"strings"
 
-	"atlassian-graphql/graphql/canonical"
-	"atlassian-graphql/graphql/gen"
+	"atlassian-graphql/atlassian"
+	"atlassian-graphql/atlassian/rest/gen"
 )
 
-func JiraWorklogFromREST(issueKey string, worklog gen.Worklog) (canonical.JiraWorklog, error) {
+func JiraWorklogFromREST(issueKey string, worklog gen.Worklog) (atlassian.JiraWorklog, error) {
 	issue := strings.TrimSpace(issueKey)
 	if issue == "" {
-		return canonical.JiraWorklog{}, errors.New("issueKey is required")
+		return atlassian.JiraWorklog{}, errors.New("issueKey is required")
 	}
 	if worklog.ID == nil || strings.TrimSpace(*worklog.ID) == "" {
-		return canonical.JiraWorklog{}, errors.New("worklog.id is required")
+		return atlassian.JiraWorklog{}, errors.New("worklog.id is required")
 	}
 	if worklog.Started == nil || strings.TrimSpace(*worklog.Started) == "" {
-		return canonical.JiraWorklog{}, errors.New("worklog.started is required")
+		return atlassian.JiraWorklog{}, errors.New("worklog.started is required")
 	}
 	if worklog.TimeSpentSeconds == nil || *worklog.TimeSpentSeconds < 0 {
-		return canonical.JiraWorklog{}, errors.New("worklog.timeSpentSeconds is required and must be >= 0")
+		return atlassian.JiraWorklog{}, errors.New("worklog.timeSpentSeconds is required and must be >= 0")
 	}
 	if worklog.Created == nil || strings.TrimSpace(*worklog.Created) == "" {
-		return canonical.JiraWorklog{}, errors.New("worklog.created is required")
+		return atlassian.JiraWorklog{}, errors.New("worklog.created is required")
 	}
 	if worklog.Updated == nil || strings.TrimSpace(*worklog.Updated) == "" {
-		return canonical.JiraWorklog{}, errors.New("worklog.updated is required")
+		return atlassian.JiraWorklog{}, errors.New("worklog.updated is required")
 	}
 
-	var author *canonical.JiraUser
+	var author *atlassian.JiraUser
 	if worklog.Author != nil {
 		if worklog.Author.AccountID == nil || strings.TrimSpace(*worklog.Author.AccountID) == "" {
-			return canonical.JiraWorklog{}, errors.New("worklog.author.accountId is required")
+			return atlassian.JiraWorklog{}, errors.New("worklog.author.accountId is required")
 		}
 		if worklog.Author.DisplayName == nil || strings.TrimSpace(*worklog.Author.DisplayName) == "" {
-			return canonical.JiraWorklog{}, errors.New("worklog.author.displayName is required")
+			return atlassian.JiraWorklog{}, errors.New("worklog.author.displayName is required")
 		}
-		u := canonical.JiraUser{
+		u := atlassian.JiraUser{
 			AccountID:   strings.TrimSpace(*worklog.Author.AccountID),
 			DisplayName: strings.TrimSpace(*worklog.Author.DisplayName),
 		}
@@ -48,7 +48,7 @@ func JiraWorklogFromREST(issueKey string, worklog gen.Worklog) (canonical.JiraWo
 		author = &u
 	}
 
-	return canonical.JiraWorklog{
+	return atlassian.JiraWorklog{
 		IssueKey:         issue,
 		WorklogID:        strings.TrimSpace(*worklog.ID),
 		Author:           author,

@@ -43,7 +43,11 @@ func main() {
 		os.Exit(2)
 	}
 
-	outPath := filepath.Join(repoRoot, "go", "graphql", "gen", "jira_rest_api.go")
+	outPath := filepath.Join(repoRoot, "go", "atlassian", "rest", "gen", "jira_api.go")
+	if err := os.MkdirAll(filepath.Dir(outPath), 0o755); err != nil {
+		fmt.Fprintf(os.Stderr, "mkdir %s: %v\n", filepath.Dir(outPath), err)
+		os.Exit(2)
+	}
 	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
 		fmt.Fprintf(os.Stderr, "write %s: %v\n", outPath, err)
 		os.Exit(2)

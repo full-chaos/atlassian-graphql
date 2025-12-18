@@ -1,4 +1,4 @@
-package graphql
+package rest
 
 import (
 	"context"
@@ -11,14 +11,19 @@ import (
 	"time"
 
 	"log/slog"
+
+	"atlassian-graphql/atlassian"
 )
 
+const defaultTimeout = 30 * time.Second
+const defaultRetries429 = 2
+const defaultMaxWait = 60 * time.Second
 const defaultJiraRESTUserAgent = "atlassian-jira-rest-go/0.1.0"
 
 type JiraRESTClient struct {
 	BaseURL       string
 	HTTPClient    *http.Client
-	Auth          AuthProvider
+	Auth          atlassian.AuthProvider
 	Logger        *slog.Logger
 	MaxRetries429 int
 	MaxWait       time.Duration
@@ -109,7 +114,7 @@ func (c *JiraRESTClient) GetJSON(ctx context.Context, path string, query map[str
 				slog.String("path", cleanedPath),
 				slog.Int("attempt", attempt),
 				slog.Duration("duration", duration),
-				slog.Any("headers", sanitizeHeaders(req.Header)),
+				slog.Any("headers", atlassian.SanitizeHeaders(req.Header)),
 			)
 		}
 		if err != nil {
@@ -124,7 +129,7 @@ func (c *JiraRESTClient) GetJSON(ctx context.Context, path string, query map[str
 
 		if resp.StatusCode == http.StatusTooManyRequests {
 			retryHeader := resp.Header.Get("Retry-After")
-			retryAt, parserUsed, parseErr := ParseRetryAfterAny(retryHeader, nowFn())
+			retryAt, parserUsed, parseErr := atlassian.ParseRetryAfterAny(retryHeader, nowFn())
 			if parseErr != nil {
 				if c.Logger != nil {
 					c.Logger.Debug(
@@ -134,7 +139,7 @@ func (c *JiraRESTClient) GetJSON(ctx context.Context, path string, query map[str
 						slog.String("path", cleanedPath),
 					)
 				}
-				return nil, &RateLimitError{
+				return nil, &atlassian.RateLimitError{
 					RetryAfter:  time.Time{},
 					Attempts:    attempt,
 					HeaderValue: retryHeader,
@@ -171,7 +176,7 @@ func (c *JiraRESTClient) GetJSON(ctx context.Context, path string, query map[str
 			}
 
 			if overCap {
-				return nil, &RateLimitError{
+				return nil, &atlassian.RateLimitError{
 					RetryAfter:     retryAt,
 					Attempts:       attempt,
 					HeaderValue:    retryHeader,
@@ -180,7 +185,7 @@ func (c *JiraRESTClient) GetJSON(ctx context.Context, path string, query map[str
 				}
 			}
 			if !retryAllowed {
-				return nil, &RateLimitError{
+				return nil, &atlassian.RateLimitError{
 					RetryAfter:  retryAt,
 					Attempts:    attempt,
 					HeaderValue: retryHeader,
@@ -194,13 +199,13 @@ func (c *JiraRESTClient) GetJSON(ctx context.Context, path string, query map[str
 		}
 
 		if resp.StatusCode >= http.StatusInternalServerError {
-			return nil, &TransportError{
+			return nil, &atlassian.TransportError{
 				StatusCode:  resp.StatusCode,
 				BodySnippet: string(body),
 			}
 		}
 		if resp.StatusCode >= http.StatusBadRequest {
-			return nil, &TransportError{
+			return nil, &atlassian.TransportError{
 				StatusCode:  resp.StatusCode,
 				BodySnippet: string(body),
 			}
@@ -209,7 +214,7 @@ func (c *JiraRESTClient) GetJSON(ctx context.Context, path string, query map[str
 		var out map[string]any
 		if len(body) > 0 {
 			if err := json.Unmarshal(body, &out); err != nil {
-				return nil, &JSONError{Err: err}
+				return nil, &atlassian.JSONError{Err: err}
 			}
 		} else {
 			out = map[string]any{}

@@ -1,4 +1,4 @@
-package graphql
+package atlassian
 
 type GraphQLRequest struct {
 	Query         string         `json:"query"`

@@ -1,4 +1,4 @@
-package graphql
+package atlassian
 
 import (
 	"bytes"
@@ -20,6 +20,8 @@ const (
 	AtlassianAccessibleResourcesURL = "https://api.atlassian.com/oauth/token/accessible-resources"
 	AtlassianDefaultAudience        = "api.atlassian.com"
 )
+
+const defaultTimeout = 30 * time.Second
 
 type OAuthToken struct {
 	AccessToken  string `json:"access_token"`

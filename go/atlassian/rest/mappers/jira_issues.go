@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"atlassian-graphql/graphql/canonical"
-	"atlassian-graphql/graphql/gen"
+	"atlassian-graphql/atlassian"
+	"atlassian-graphql/atlassian/rest/gen"
 )
 
 func requireNonEmptyString(value string, path string) (string, error) {
@@ -57,7 +57,7 @@ func optionalStringField(obj map[string]any, key string) (*string, error) {
 	return &clean, nil
 }
 
-func optionalUser(obj map[string]any, key string, path string) (*canonical.JiraUser, error) {
+func optionalUser(obj map[string]any, key string, path string) (*atlassian.JiraUser, error) {
 	raw, ok := obj[key]
 	if !ok || raw == nil {
 		return nil, nil
@@ -78,62 +78,62 @@ func optionalUser(obj map[string]any, key string, path string) (*canonical.JiraU
 	if err != nil {
 		return nil, fmt.Errorf("%s.%s.emailAddress: %w", path, key, err)
 	}
-	return &canonical.JiraUser{
+	return &atlassian.JiraUser{
 		AccountID:   accountID,
 		DisplayName: displayName,
 		Email:       email,
 	}, nil
 }
 
-func JiraIssueFromREST(cloudID string, issue gen.IssueBean) (canonical.JiraIssue, error) {
+func JiraIssueFromREST(cloudID string, issue gen.IssueBean) (atlassian.JiraIssue, error) {
 	cloud := strings.TrimSpace(cloudID)
 	if cloud == "" {
-		return canonical.JiraIssue{}, errors.New("cloudID is required")
+		return atlassian.JiraIssue{}, errors.New("cloudID is required")
 	}
 	if issue.Key == nil || strings.TrimSpace(*issue.Key) == "" {
-		return canonical.JiraIssue{}, errors.New("issue.key is required")
+		return atlassian.JiraIssue{}, errors.New("issue.key is required")
 	}
 	fields := issue.Fields
 	if fields == nil {
-		return canonical.JiraIssue{}, errors.New("issue.fields is required")
+		return atlassian.JiraIssue{}, errors.New("issue.fields is required")
 	}
 
 	issueKey := strings.TrimSpace(*issue.Key)
 
 	projectObj, err := requireMapField(fields, "project", "issue.fields")
 	if err != nil {
-		return canonical.JiraIssue{}, err
+		return atlassian.JiraIssue{}, err
 	}
 	projectKey, err := requireStringField(projectObj, "key", "issue.fields.project")
 	if err != nil {
-		return canonical.JiraIssue{}, err
+		return atlassian.JiraIssue{}, err
 	}
 
 	issuetypeObj, err := requireMapField(fields, "issuetype", "issue.fields")
 	if err != nil {
-		return canonical.JiraIssue{}, err
+		return atlassian.JiraIssue{}, err
 	}
 	issueType, err := requireStringField(issuetypeObj, "name", "issue.fields.issuetype")
 	if err != nil {
-		return canonical.JiraIssue{}, err
+		return atlassian.JiraIssue{}, err
 	}
 
 	statusObj, err := requireMapField(fields, "status", "issue.fields")
 	if err != nil {
-		return canonical.JiraIssue{}, err
+		return atlassian.JiraIssue{}, err
 	}
 	status, err := requireStringField(statusObj, "name", "issue.fields.status")
 	if err != nil {
-		return canonical.JiraIssue{}, err
+		return atlassian.JiraIssue{}, err
 	}
 
 	createdAt, err := requireStringField(fields, "created", "issue.fields")
 	if err != nil {
-		return canonical.JiraIssue{}, err
+		return atlassian.JiraIssue{}, err
 	}
 	updatedAt, err := requireStringField(fields, "updated", "issue.fields")
 	if err != nil {
-		return canonical.JiraIssue{}, err
+		return atlassian.JiraIssue{}, err
 	}
 
 	var resolvedAt *string
@@ -142,7 +142,7 @@ func JiraIssueFromREST(cloudID string, issue gen.IssueBean) (canonical.JiraIssue
 			clean := strings.TrimSpace(s)
 			resolvedAt = &clean
 		} else if !ok {
-			return canonical.JiraIssue{}, errors.New("issue.fields.resolutiondate must be a string when present")
+			return atlassian.JiraIssue{}, errors.New("issue.fields.resolutiondate must be a string when present")
 		}
 	}
 
@@ -150,12 +150,12 @@ func JiraIssueFromREST(cloudID string, issue gen.IssueBean) (canonical.JiraIssue
 	if raw, ok := fields["labels"]; ok && raw != nil {
 		arr, ok := raw.([]any)
 		if !ok {
-			return canonical.JiraIssue{}, errors.New("issue.fields.labels must be a list when present")
+			return atlassian.JiraIssue{}, errors.New("issue.fields.labels must be a list when present")
 		}
 		for idx, item := range arr {
 			s, ok := item.(string)
 			if !ok || strings.TrimSpace(s) == "" {
-				return canonical.JiraIssue{}, fmt.Errorf("issue.fields.labels[%d] must be a non-empty string", idx)
+				return atlassian.JiraIssue{}, fmt.Errorf("issue.fields.labels[%d] must be a non-empty string", idx)
 			}
 			labels = append(labels, strings.TrimSpace(s))
 		}
@@ -165,16 +165,16 @@ func JiraIssueFromREST(cloudID string, issue gen.IssueBean) (canonical.JiraIssue
 	if raw, ok := fields["components"]; ok && raw != nil {
 		arr, ok := raw.([]any)
 		if !ok {
-			return canonical.JiraIssue{}, errors.New("issue.fields.components must be a list when present")
+			return atlassian.JiraIssue{}, errors.New("issue.fields.components must be a list when present")
 		}
 		for idx, item := range arr {
 			obj, ok := item.(map[string]any)
 			if !ok {
-				return canonical.JiraIssue{}, fmt.Errorf("issue.fields.components[%d] must be an object", idx)
+				return atlassian.JiraIssue{}, fmt.Errorf("issue.fields.components[%d] must be an object", idx)
 			}
 			name, err := requireStringField(obj, "name", fmt.Sprintf("issue.fields.components[%d]", idx))
 			if err != nil {
-				return canonical.JiraIssue{}, err
+				return atlassian.JiraIssue{}, err
 			}
 			components = append(components, name)
 		}
@@ -182,14 +182,14 @@ func JiraIssueFromREST(cloudID string, issue gen.IssueBean) (canonical.JiraIssue
 
 	assignee, err := optionalUser(fields, "assignee", "issue.fields")
 	if err != nil {
-		return canonical.JiraIssue{}, err
+		return atlassian.JiraIssue{}, err
 	}
 	reporter, err := optionalUser(fields, "reporter", "issue.fields")
 	if err != nil {
-		return canonical.JiraIssue{}, err
+		return atlassian.JiraIssue{}, err
 	}
 
-	return canonical.JiraIssue{
+	return atlassian.JiraIssue{
 		CloudID:     cloud,
 		Key:         issueKey,
 		ProjectKey:  projectKey,

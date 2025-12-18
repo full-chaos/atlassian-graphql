@@ -13,7 +13,8 @@ import (
 	"testing"
 	"time"
 
-	"atlassian-graphql/graphql"
+	"atlassian-graphql/atlassian"
+	"atlassian-graphql/atlassian/graph"
 	"log/slog"
 )
 
@@ -38,7 +39,7 @@ func TestLiveSmoke(t *testing.T) {
 	buf := &bytes.Buffer{}
 	logger := slog.New(slog.NewTextHandler(buf, &slog.HandlerOptions{Level: slog.LevelDebug}))
 
-	client := graphql.Client{
+	client := graph.Client{
 		BaseURL:       baseURL,
 		Auth:          auth,
 		Strict:        false,
@@ -56,7 +57,7 @@ func TestLiveSmoke(t *testing.T) {
 		1,
 	)
 	if err != nil {
-		if rlErr, ok := err.(*graphql.RateLimitError); ok {
+		if rlErr, ok := err.(*atlassian.RateLimitError); ok {
 			if !strings.Contains(buf.String(), "rate limited") {
 				t.Fatalf("rate limit encountered without warning log: %v", rlErr)
 			}
@@ -74,7 +75,7 @@ func TestLiveSmoke(t *testing.T) {
 	}
 }
 
-func buildAuth(t *testing.T) graphql.AuthProvider {
+func buildAuth(t *testing.T) atlassian.AuthProvider {
 	token := os.Getenv("ATLASSIAN_OAUTH_ACCESS_TOKEN")
 	refreshToken := os.Getenv("ATLASSIAN_OAUTH_REFRESH_TOKEN")
 	clientID := os.Getenv("ATLASSIAN_CLIENT_ID")
@@ -84,7 +85,7 @@ func buildAuth(t *testing.T) graphql.AuthProvider {
 	clientSecret := os.Getenv("ATLASSIAN_CLIENT_SECRET")
 
 	if strings.TrimSpace(refreshToken) != "" && strings.TrimSpace(clientID) != "" && strings.TrimSpace(clientSecret) != "" {
-		return &graphql.OAuthRefreshTokenAuth{
+		return &atlassian.OAuthRefreshTokenAuth{
 			ClientID:     clientID,
 			ClientSecret: clientSecret,
 			RefreshToken: refreshToken,
@@ -95,12 +96,12 @@ func buildAuth(t *testing.T) graphql.AuthProvider {
 		if clientSecret != "" && strings.TrimSpace(token) == strings.TrimSpace(clientSecret) {
 			t.Fatal("ATLASSIAN_OAUTH_ACCESS_TOKEN appears to be set to ATLASSIAN_CLIENT_SECRET; set an OAuth access token (not the client secret)")
 		}
-		return graphql.BearerAuth{
+		return atlassian.BearerAuth{
 			TokenGetter: func() (string, error) { return token, nil },
 		}
 	}
 	if email != "" && apiToken != "" {
-		return graphql.BasicAPITokenAuth{
+		return atlassian.BasicAPITokenAuth{
 			Email: email,
 			Token: apiToken,
 		}
@@ -112,7 +113,7 @@ func buildAuth(t *testing.T) graphql.AuthProvider {
 			for k, v := range cookies {
 				httpCookies = append(httpCookies, &http.Cookie{Name: k, Value: v})
 			}
-			return graphql.CookieAuth{Cookies: httpCookies}
+			return atlassian.CookieAuth{Cookies: httpCookies}
 		}
 	}
 

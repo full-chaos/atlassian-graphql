@@ -1,4 +1,4 @@
-package graphql
+package graph
 
 import (
 	"bytes"
@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"log/slog"
+
+	"atlassian-graphql/atlassian"
 )
 
 const defaultUserAgent = "atlassian-graphql-go/0.1.0"
@@ -33,7 +35,7 @@ func buildGraphQLURL(baseURL string) (string, error) {
 type Client struct {
 	BaseURL               string
 	HTTPClient            *http.Client
-	Auth                  AuthProvider
+	Auth                  atlassian.AuthProvider
 	Strict                bool
 	ExperimentalAPIs      []string
 	Logger                *slog.Logger
@@ -47,7 +49,7 @@ type Client struct {
 	localBucket *tokenBucket
 }
 
-func (c *Client) Execute(ctx context.Context, query string, variables map[string]any, operationName string, experimentalAPIs []string, estimatedCost int) (*Result, error) {
+func (c *Client) Execute(ctx context.Context, query string, variables map[string]any, operationName string, experimentalAPIs []string, estimatedCost int) (*atlassian.Result, error) {
 	if strings.TrimSpace(query) == "" {
 		return nil, errors.New("query must be provided")
 	}
@@ -97,7 +99,7 @@ func (c *Client) Execute(ctx context.Context, query string, variables map[string
 		bucket = c.localBucket
 	}
 
-	payload := GraphQLRequest{
+	payload := atlassian.GraphQLRequest{
 		Query:         query,
 		Variables:     variables,
 		OperationName: operationName,
@@ -159,7 +161,7 @@ func (c *Client) Execute(ctx context.Context, query string, variables map[string
 				slog.String("operationName", operationName),
 				slog.Int("attempt", attempt),
 				slog.Duration("duration", duration),
-				slog.Any("headers", sanitizeHeaders(req.Header)),
+				slog.Any("headers", atlassian.SanitizeHeaders(req.Header)),
 			)
 		}
 		if err != nil {
@@ -175,7 +177,7 @@ func (c *Client) Execute(ctx context.Context, query string, variables map[string
 		if resp.StatusCode == http.StatusTooManyRequests {
 			retryHeader := resp.Header.Get("Retry-After")
 			requestID := extractRequestID(body)
-			retryAt, parserUsed, parseErr := ParseRetryAfter(retryHeader)
+			retryAt, parserUsed, parseErr := atlassian.ParseRetryAfter(retryHeader)
 			if parseErr != nil {
 				if c.Logger != nil {
 					c.Logger.Debug(
@@ -185,7 +187,7 @@ func (c *Client) Execute(ctx context.Context, query string, variables map[string
 						slog.String("operationName", operationName),
 					)
 				}
-				return nil, &RateLimitError{
+				return nil, &atlassian.RateLimitError{
 					RetryAfter:  time.Time{},
 					Attempts:    attempt,
 					HeaderValue: retryHeader,
@@ -225,7 +227,7 @@ func (c *Client) Execute(ctx context.Context, query string, variables map[string
 			}
 
 			if overCap {
-				return nil, &RateLimitError{
+				return nil, &atlassian.RateLimitError{
 					RetryAfter:     retryAt,
 					Attempts:       attempt,
 					HeaderValue:    retryHeader,
@@ -234,7 +236,7 @@ func (c *Client) Execute(ctx context.Context, query string, variables map[string
 				}
 			}
 			if !retryAllowed {
-				return nil, &RateLimitError{
+				return nil, &atlassian.RateLimitError{
 					RetryAfter:  retryAt,
 					Attempts:    attempt,
 					HeaderValue: retryHeader,
@@ -249,27 +251,27 @@ func (c *Client) Execute(ctx context.Context, query string, variables map[string
 		}
 
 		if resp.StatusCode >= http.StatusInternalServerError {
-			return nil, &TransportError{
+			return nil, &atlassian.TransportError{
 				StatusCode:  resp.StatusCode,
 				BodySnippet: string(body),
 			}
 		}
 		if resp.StatusCode >= http.StatusBadRequest {
-			return nil, &TransportError{
+			return nil, &atlassian.TransportError{
 				StatusCode:  resp.StatusCode,
 				BodySnippet: string(body),
 			}
 		}
 
-		var result Result
+		var result atlassian.Result
 		if len(body) > 0 {
 			if err := json.Unmarshal(body, &result); err != nil {
-				return nil, &JSONError{Err: err}
+				return nil, &atlassian.JSONError{Err: err}
 			}
 		}
 
 		if c.Strict && len(result.Errors) > 0 {
-			return nil, &GraphQLOperationError{
+			return nil, &atlassian.GraphQLOperationError{
 				Errors:      result.Errors,
 				PartialData: result.Data,
 			}

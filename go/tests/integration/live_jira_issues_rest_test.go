@@ -12,7 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"atlassian-graphql/graphql"
+	"atlassian-graphql/atlassian"
+	"atlassian-graphql/atlassian/rest"
 	"log/slog"
 )
 
@@ -52,7 +53,7 @@ func TestLiveJiraIssuesREST(t *testing.T) {
 	buf := &bytes.Buffer{}
 	logger := slog.New(slog.NewTextHandler(buf, &slog.HandlerOptions{Level: slog.LevelInfo}))
 
-	client := graphql.JiraRESTClient{
+	client := rest.JiraRESTClient{
 		BaseURL:       baseURL,
 		Auth:          auth,
 		MaxRetries429: 1,
@@ -62,7 +63,7 @@ func TestLiveJiraIssuesREST(t *testing.T) {
 
 	issues, err := client.ListIssuesViaREST(context.Background(), cloudID, jql, 1)
 	if err != nil {
-		if _, ok := err.(*graphql.RateLimitError); ok {
+		if _, ok := err.(*atlassian.RateLimitError); ok {
 			t.Skipf("rate limited during integration: %v", err)
 		}
 		t.Fatalf("unexpected error: %v", err)
@@ -111,7 +112,7 @@ func TestLiveJiraIssueHistoryREST(t *testing.T) {
 	buf := &bytes.Buffer{}
 	logger := slog.New(slog.NewTextHandler(buf, &slog.HandlerOptions{Level: slog.LevelInfo}))
 
-	client := graphql.JiraRESTClient{
+	client := rest.JiraRESTClient{
 		BaseURL:       baseURL,
 		Auth:          auth,
 		MaxRetries429: 1,
@@ -120,13 +121,13 @@ func TestLiveJiraIssueHistoryREST(t *testing.T) {
 	}
 
 	if _, err := client.ListIssueChangelogViaREST(context.Background(), issueKey, 1); err != nil {
-		if _, ok := err.(*graphql.RateLimitError); ok {
+		if _, ok := err.(*atlassian.RateLimitError); ok {
 			t.Skipf("rate limited during integration: %v", err)
 		}
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if _, err := client.ListIssueWorklogsViaREST(context.Background(), issueKey, 1); err != nil {
-		if _, ok := err.(*graphql.RateLimitError); ok {
+		if _, ok := err.(*atlassian.RateLimitError); ok {
 			t.Skipf("rate limited during integration: %v", err)
 		}
 		t.Fatalf("unexpected error: %v", err)

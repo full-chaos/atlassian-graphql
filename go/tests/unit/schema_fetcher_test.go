@@ -9,18 +9,18 @@ import (
 	"testing"
 	"time"
 
-	"atlassian-graphql/graphql"
+	"atlassian-graphql/atlassian/graph"
 )
 
 func TestSchemaFetcherWritesIntrospectionJSON(t *testing.T) {
 	var capturedBeta []string
 
 	outDir := t.TempDir()
-	res, err := graphql.FetchSchemaIntrospection(
+	res, err := graph.FetchSchemaIntrospection(
 		context.Background(),
 		"http://example",
 		noAuth{},
-		graphql.SchemaFetchOptions{
+		graph.SchemaFetchOptions{
 			OutputDir:        outDir,
 			ExperimentalAPIs: []string{"featureA", "featureB"},
 			Timeout:          2 * time.Second,

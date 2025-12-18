@@ -6,13 +6,13 @@ import (
 	"reflect"
 	"testing"
 
-	"atlassian-graphql/graphql"
+	"atlassian-graphql/atlassian/graph"
 )
 
 func TestExperimentalHeadersRepeated(t *testing.T) {
 	var headers []string
 
-	client := graphql.Client{
+	client := graph.Client{
 		BaseURL: "http://example",
 		Auth:    noAuth{},
 		HTTPClient: newHTTPClient(func(req *http.Request) *http.Response {
@@ -32,7 +32,7 @@ func TestExperimentalHeadersRepeated(t *testing.T) {
 func TestExperimentalHeadersAppliedToJiraProjects(t *testing.T) {
 	var all [][]string
 
-	client := graphql.Client{
+	client := graph.Client{
 		BaseURL:          "http://example",
 		Auth:             noAuth{},
 		ExperimentalAPIs: []string{"a", "b"},

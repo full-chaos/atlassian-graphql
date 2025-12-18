@@ -1,4 +1,4 @@
-package graphql
+package rest
 
 import (
 	"context"
@@ -7,12 +7,12 @@ import (
 	"strconv"
 	"strings"
 
-	"atlassian-graphql/graphql/canonical"
-	"atlassian-graphql/graphql/gen"
-	"atlassian-graphql/graphql/mappers"
+	"atlassian-graphql/atlassian"
+	"atlassian-graphql/atlassian/rest/gen"
+	"atlassian-graphql/atlassian/rest/mappers"
 )
 
-func (c *JiraRESTClient) ListIssueChangelogViaREST(ctx context.Context, issueKey string, pageSize int) ([]canonical.JiraChangelogEvent, error) {
+func (c *JiraRESTClient) ListIssueChangelogViaREST(ctx context.Context, issueKey string, pageSize int) ([]atlassian.JiraChangelogEvent, error) {
 	issue := strings.TrimSpace(issueKey)
 	if issue == "" {
 		return nil, errors.New("issueKey is required")
@@ -23,7 +23,7 @@ func (c *JiraRESTClient) ListIssueChangelogViaREST(ctx context.Context, issueKey
 
 	startAt := 0
 	seenStart := map[int]struct{}{}
-	var out []canonical.JiraChangelogEvent
+	var out []atlassian.JiraChangelogEvent
 
 	for {
 		if _, ok := seenStart[startAt]; ok {

@@ -12,7 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"atlassian-graphql/graphql"
+	"atlassian-graphql/atlassian"
+	"atlassian-graphql/atlassian/rest"
 	"log/slog"
 )
 
@@ -47,7 +48,7 @@ func TestLiveJiraProjectsREST(t *testing.T) {
 	buf := &bytes.Buffer{}
 	logger := slog.New(slog.NewTextHandler(buf, &slog.HandlerOptions{Level: slog.LevelInfo}))
 
-	client := graphql.JiraRESTClient{
+	client := rest.JiraRESTClient{
 		BaseURL:       baseURL,
 		Auth:          auth,
 		MaxRetries429: 1,
@@ -57,7 +58,7 @@ func TestLiveJiraProjectsREST(t *testing.T) {
 
 	projects, err := client.ListProjectsViaREST(context.Background(), cloudID, []string{"SOFTWARE"}, 50)
 	if err != nil {
-		if _, ok := err.(*graphql.RateLimitError); ok {
+		if _, ok := err.(*atlassian.RateLimitError); ok {
 			t.Skipf("rate limited during integration: %v", err)
 		}
 		t.Fatalf("unexpected error: %v", err)

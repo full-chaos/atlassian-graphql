@@ -6,7 +6,8 @@ import (
 	"net/http"
 	"testing"
 
-	"atlassian-graphql/graphql"
+	"atlassian-graphql/atlassian"
+	"atlassian-graphql/atlassian/graph"
 )
 
 func TestOAuthRefreshTokenAuthAppliesAndCachesToken(t *testing.T) {
@@ -36,7 +37,7 @@ func TestOAuthRefreshTokenAuthAppliesAndCachesToken(t *testing.T) {
 		}
 	})
 
-	auth := &graphql.OAuthRefreshTokenAuth{
+	auth := &atlassian.OAuthRefreshTokenAuth{
 		ClientID:     "client-id",
 		ClientSecret: "client-secret",
 		RefreshToken: "refresh-token",
@@ -44,7 +45,7 @@ func TestOAuthRefreshTokenAuthAppliesAndCachesToken(t *testing.T) {
 		HTTPClient:   httpClient,
 	}
 
-	client := graphql.Client{
+	client := graph.Client{
 		BaseURL:    "http://example",
 		Auth:       auth,
 		HTTPClient: httpClient,
@@ -69,4 +70,3 @@ func TestOAuthRefreshTokenAuthAppliesAndCachesToken(t *testing.T) {
 		t.Fatalf("unexpected auth headers: %#v", authHeaders)
 	}
 }
-

@@ -1,11 +1,11 @@
-package graphql
+package atlassian
 
 import (
 	"net/http"
 	"strings"
 )
 
-func sanitizeHeaders(h http.Header) http.Header {
+func SanitizeHeaders(h http.Header) http.Header {
 	clean := http.Header{}
 	for k, vals := range h {
 		switch strings.ToLower(k) {

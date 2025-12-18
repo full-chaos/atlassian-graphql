@@ -12,7 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"atlassian-graphql/graphql"
+	"atlassian-graphql/atlassian"
+	"atlassian-graphql/atlassian/graph"
 	"log/slog"
 )
 
@@ -45,7 +46,7 @@ func TestLiveJiraProjects(t *testing.T) {
 	buf := &bytes.Buffer{}
 	logger := slog.New(slog.NewTextHandler(buf, &slog.HandlerOptions{Level: slog.LevelInfo}))
 
-	client := graphql.Client{
+	client := graph.Client{
 		BaseURL:          baseURL,
 		Auth:             auth,
 		Strict:           false,
@@ -62,12 +63,12 @@ func TestLiveJiraProjects(t *testing.T) {
 		50,
 	)
 	if err != nil {
-		if opErr, ok := err.(*graphql.GraphQLOperationError); ok {
+		if opErr, ok := err.(*atlassian.GraphQLOperationError); ok {
 			if isOAuthAuth(auth) && hasRequiredScope(opErr, "jira:atlassian-external") {
 				t.Skip("AGG returned required_scopes=['jira:atlassian-external'] for jira.allJiraProjects. This appears to be a non-standard OAuth scope; if you can't obtain it via Atlassian 3LO, run this integration test with tenanted gateway auth (ATLASSIAN_GQL_BASE_URL=https://<site>.atlassian.net/gateway/api + ATLASSIAN_EMAIL/ATLASSIAN_API_TOKEN or ATLASSIAN_COOKIES_JSON).")
 			}
 		}
-		if _, ok := err.(*graphql.RateLimitError); ok {
+		if _, ok := err.(*atlassian.RateLimitError); ok {
 			t.Skipf("rate limited during integration: %v", err)
 		}
 		t.Fatalf("unexpected error: %v", err)
@@ -80,16 +81,16 @@ func TestLiveJiraProjects(t *testing.T) {
 	}
 }
 
-func isOAuthAuth(auth graphql.AuthProvider) bool {
+func isOAuthAuth(auth atlassian.AuthProvider) bool {
 	switch auth.(type) {
-	case graphql.BearerAuth, *graphql.OAuthRefreshTokenAuth:
+	case atlassian.BearerAuth, *atlassian.OAuthRefreshTokenAuth:
 		return true
 	default:
 		return false
 	}
 }
 
-func hasRequiredScope(err *graphql.GraphQLOperationError, scope string) bool {
+func hasRequiredScope(err *atlassian.GraphQLOperationError, scope string) bool {
 	needle := strings.TrimSpace(scope)
 	if needle == "" {
 		return false

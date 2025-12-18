@@ -1,16 +1,18 @@
-package graphql
+package graph
 
 import (
 	"context"
 	"encoding/json"
 	"errors"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"log/slog"
-	"net/http"
+
+	"atlassian-graphql/atlassian"
 )
 
 const introspectionQuery = `
@@ -119,7 +121,7 @@ type SchemaFetchOptions struct {
 func FetchSchemaIntrospection(
 	ctx context.Context,
 	baseURL string,
-	auth AuthProvider,
+	auth atlassian.AuthProvider,
 	opts SchemaFetchOptions,
 ) (*SchemaFetchResult, error) {
 	if strings.TrimSpace(baseURL) == "" {

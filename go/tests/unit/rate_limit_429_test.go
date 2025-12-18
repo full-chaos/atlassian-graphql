@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"atlassian-graphql/graphql"
+	"atlassian-graphql/atlassian/graph"
 )
 
 func TestJiraProjectsRetriesOn429RetryAfterTimestamp(t *testing.T) {
@@ -15,7 +15,7 @@ func TestJiraProjectsRetriesOn429RetryAfterTimestamp(t *testing.T) {
 	var slept []time.Duration
 	attempts := 0
 
-	client := graphql.Client{
+	client := graph.Client{
 		BaseURL:       "http://example",
 		Auth:          noAuth{},
 		MaxRetries429: 1,
@@ -59,4 +59,3 @@ func TestJiraProjectsRetriesOn429RetryAfterTimestamp(t *testing.T) {
 		t.Fatalf("expected single 2s sleep, got %v", slept)
 	}
 }
-

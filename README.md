@@ -24,7 +24,7 @@ Jira Cloud publishes a Swagger/OpenAPI spec for REST v3. You can fetch it into t
 
 - `make jira-rest-openapi` (writes `openapi/jira-rest.swagger-v3.json`)
 - Generate minimal, analytics-focused REST models from the swagger JSON:
-  - `make jira-rest-gen` (writes `python/atlassian/rest/gen/jira_api.py` and `go/graphql/gen/jira_rest_api.go`)
+  - `make jira-rest-gen` (writes `python/atlassian/rest/gen/jira_api.py` and `go/atlassian/rest/gen/jira_api.go`)
 
 ## Endpoints
 
@@ -115,21 +115,23 @@ projects = list(list_projects_via_rest("YOUR_CLOUD_ID", ["SOFTWARE"]))
 ```go
 import (
     "context"
-    "atlassian-graphql/graphql"
+    "atlassian-graphql/atlassian"
+    "atlassian-graphql/atlassian/graph"
+    "atlassian-graphql/atlassian/rest"
 )
 
-client := graphql.Client{
+client := graph.Client{
     BaseURL: "https://api.atlassian.com",
-    Auth: graphql.BearerAuth{
+    Auth: atlassian.BearerAuth{
         TokenGetter: func() (string, error) { return "ACCESS_TOKEN", nil },
     },
     Strict: true,
 }
 
 // OAuth refresh token (auto-refreshes access tokens)
-client = graphql.Client{
+client = graph.Client{
     BaseURL: "https://api.atlassian.com",
-    Auth: &graphql.OAuthRefreshTokenAuth{
+    Auth: &atlassian.OAuthRefreshTokenAuth{
         ClientID: "CLIENT_ID",
         ClientSecret: "CLIENT_SECRET",
         RefreshToken: "REFRESH_TOKEN",
@@ -156,9 +158,9 @@ projects, err := client.ListProjectsWithOpsgenieLinkableTeams(
 )
 
 // Jira projects via Jira REST (OAuth-friendly; returns empty opsgenieTeams)
-rest := graphql.JiraRESTClient{
+rest := rest.JiraRESTClient{
     BaseURL: "https://api.atlassian.com/ex/jira/" + "YOUR_CLOUD_ID",
-    Auth: graphql.BearerAuth{
+    Auth: atlassian.BearerAuth{
         TokenGetter: func() (string, error) { return "ACCESS_TOKEN", nil },
     },
 }
@@ -180,9 +182,9 @@ projects, err = rest.ListProjectsViaREST(context.Background(), "YOUR_CLOUD_ID", 
 
 ## Canonical vs API models
 
-- API models (`python/atlassian/graph/gen/`, `python/atlassian/rest/gen/`, `go/graphql/gen/`) are generated from live schemas and match the API response shape for specific operations/endpoints.
-- Canonical models (`python/atlassian/canonical_models.py`, `go/graphql/canonical/models.go`) are stable, versioned analytics schemas (source-of-truth: `openapi/jira-developer-health.canonical.openapi.yaml`).
-- Mappers live in `python/atlassian/graph/mappers/`, `python/atlassian/rest/mappers/`, and `go/graphql/mappers/`.
+- API models (`python/atlassian/graph/gen/`, `python/atlassian/rest/gen/`, `go/atlassian/graph/gen/`, `go/atlassian/rest/gen/`) are generated from live schemas and match the API response shape for specific operations/endpoints.
+- Canonical models (`python/atlassian/canonical_models.py`, `go/atlassian/canonical_models.go`) are stable, versioned analytics schemas (source-of-truth: `openapi/jira-developer-health.canonical.openapi.yaml`).
+- Mappers live in `python/atlassian/graph/mappers/`, `python/atlassian/rest/mappers/`, `go/atlassian/graph/mappers/`, and `go/atlassian/rest/mappers/`.
 
 ## Tests
 

@@ -1,4 +1,4 @@
-package graphql
+package graph
 
 import (
 	"context"
@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"strings"
 
-	"atlassian-graphql/graphql/gen"
-	"atlassian-graphql/graphql/mappers"
+	"atlassian-graphql/atlassian"
+	"atlassian-graphql/atlassian/graph/gen"
+	"atlassian-graphql/atlassian/graph/mappers"
 )
 
-func (c *Client) ListProjectsWithOpsgenieLinkableTeams(ctx context.Context, cloudID string, projectTypes []string, pageSize int) ([]CanonicalProjectWithOpsgenieTeams, error) {
+func (c *Client) ListProjectsWithOpsgenieLinkableTeams(ctx context.Context, cloudID string, projectTypes []string, pageSize int) ([]atlassian.CanonicalProjectWithOpsgenieTeams, error) {
 	cloud := strings.TrimSpace(cloudID)
 	if cloud == "" {
 		return nil, errors.New("cloudID is required")
@@ -35,7 +36,7 @@ func (c *Client) ListProjectsWithOpsgenieLinkableTeams(ctx context.Context, clou
 		return nil, err
 	}
 
-	var out []CanonicalProjectWithOpsgenieTeams
+	var out []atlassian.CanonicalProjectWithOpsgenieTeams
 	var after any = nil
 	seenCursors := map[string]struct{}{}
 
@@ -56,7 +57,7 @@ func (c *Client) ListProjectsWithOpsgenieLinkableTeams(ctx context.Context, clou
 		page, err := gen.DecodeJiraProjectsPage(result.Data)
 		if err != nil {
 			if len(result.Errors) > 0 {
-				return nil, &GraphQLOperationError{Errors: result.Errors, PartialData: result.Data}
+				return nil, &atlassian.GraphQLOperationError{Errors: result.Errors, PartialData: result.Data}
 			}
 			return nil, fmt.Errorf("decode JiraProjectsPage: %w", err)
 		}
@@ -176,7 +177,7 @@ func (c *Client) paginateOpsgenieTeams(ctx context.Context, cloudID string, proj
 		conn, err := gen.DecodeProjectOpsgenieTeams(result.Data)
 		if err != nil {
 			if len(result.Errors) > 0 {
-				return nil, &GraphQLOperationError{Errors: result.Errors, PartialData: result.Data}
+				return nil, &atlassian.GraphQLOperationError{Errors: result.Errors, PartialData: result.Data}
 			}
 			return nil, fmt.Errorf("decode JiraProjectOpsgenieTeamsPage: %w", err)
 		}

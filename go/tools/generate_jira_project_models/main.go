@@ -14,7 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"atlassian-graphql/graphql"
+	"atlassian-graphql/atlassian"
+	"atlassian-graphql/atlassian/graph"
 )
 
 type config struct {
@@ -68,13 +69,13 @@ func main() {
 			os.Exit(2)
 		}
 
-		opts := graphql.SchemaFetchOptions{
+		opts := graph.SchemaFetchOptions{
 			OutputDir:        filepath.Dir(schemaPath),
 			ExperimentalAPIs: parseExperimentalAPIs(),
 			Timeout:          30 * time.Second,
 			HTTPClient:       &http.Client{Timeout: 30 * time.Second},
 		}
-		if _, err := graphql.FetchSchemaIntrospection(context.Background(), baseURL, auth, opts); err != nil {
+		if _, err := graph.FetchSchemaIntrospection(context.Background(), baseURL, auth, opts); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(2)
 		}
@@ -91,7 +92,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	outPath := filepath.Join(repoRoot, "go", "graphql", "gen", "jira_projects_api.go")
+	outPath := filepath.Join(repoRoot, "go", "atlassian", "graph", "gen", "jira_projects_api.go")
 	if err := os.MkdirAll(filepath.Dir(outPath), 0o755); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(2)
@@ -139,7 +140,7 @@ func parseExperimentalAPIs() []string {
 	return out
 }
 
-func buildAuthFromEnv() graphql.AuthProvider {
+func buildAuthFromEnv() atlassian.AuthProvider {
 	token := strings.TrimSpace(os.Getenv("ATLASSIAN_OAUTH_ACCESS_TOKEN"))
 	refreshToken := strings.TrimSpace(os.Getenv("ATLASSIAN_OAUTH_REFRESH_TOKEN"))
 	clientID := strings.TrimSpace(os.Getenv("ATLASSIAN_CLIENT_ID"))
@@ -149,7 +150,7 @@ func buildAuthFromEnv() graphql.AuthProvider {
 	cookiesJSON := strings.TrimSpace(os.Getenv("ATLASSIAN_COOKIES_JSON"))
 
 	if refreshToken != "" && clientID != "" && clientSecret != "" {
-		return &graphql.OAuthRefreshTokenAuth{
+		return &atlassian.OAuthRefreshTokenAuth{
 			ClientID:     clientID,
 			ClientSecret: clientSecret,
 			RefreshToken: refreshToken,
@@ -161,12 +162,12 @@ func buildAuthFromEnv() graphql.AuthProvider {
 			fmt.Fprintln(os.Stderr, "ATLASSIAN_OAUTH_ACCESS_TOKEN appears to be set to ATLASSIAN_CLIENT_SECRET; set an OAuth access token (not the client secret).")
 			return nil
 		}
-		return graphql.BearerAuth{
+		return atlassian.BearerAuth{
 			TokenGetter: func() (string, error) { return token, nil },
 		}
 	}
 	if email != "" && apiToken != "" {
-		return graphql.BasicAPITokenAuth{Email: email, Token: apiToken}
+		return atlassian.BasicAPITokenAuth{Email: email, Token: apiToken}
 	}
 	if cookiesJSON != "" {
 		var cookies map[string]string
@@ -175,7 +176,7 @@ func buildAuthFromEnv() graphql.AuthProvider {
 			for k, v := range cookies {
 				httpCookies = append(httpCookies, &http.Cookie{Name: k, Value: v})
 			}
-			return graphql.CookieAuth{Cookies: httpCookies}
+			return atlassian.CookieAuth{Cookies: httpCookies}
 		}
 	}
 	return nil

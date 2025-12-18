@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"atlassian-graphql/graphql"
+	"atlassian-graphql/atlassian"
 )
 
 func main() {
@@ -28,7 +28,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	authorizeURL, err := graphql.BuildAuthorizeURL(*clientID, *redirectURI, scopes, *state)
+	authorizeURL, err := atlassian.BuildAuthorizeURL(*clientID, *redirectURI, scopes, *state)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(2)
@@ -47,13 +47,13 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	token, err := graphql.ExchangeAuthorizationCode(
+	token, err := atlassian.ExchangeAuthorizationCode(
 		ctx,
 		*clientID,
 		*clientSecret,
 		code,
 		*redirectURI,
-		graphql.OAuthTokenRequestOptions{Timeout: 30 * time.Second},
+		atlassian.OAuthTokenRequestOptions{Timeout: 30 * time.Second},
 	)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -70,10 +70,10 @@ func main() {
 	}
 
 	if *printResources {
-		resources, err := graphql.FetchAccessibleResources(
+		resources, err := atlassian.FetchAccessibleResources(
 			ctx,
 			token.AccessToken,
-			graphql.AccessibleResourcesOptions{Timeout: 30 * time.Second},
+			atlassian.AccessibleResourcesOptions{Timeout: 30 * time.Second},
 		)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Failed to fetch accessible resources:", err)

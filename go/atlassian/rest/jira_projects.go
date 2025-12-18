@@ -1,4 +1,4 @@
-package graphql
+package rest
 
 import (
 	"context"
@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"atlassian-graphql/graphql/canonical"
-	"atlassian-graphql/graphql/gen"
-	"atlassian-graphql/graphql/mappers"
+	"atlassian-graphql/atlassian"
+	"atlassian-graphql/atlassian/rest/gen"
+	"atlassian-graphql/atlassian/rest/mappers"
 )
 
 func normalizeProjectTypeFilter(values []string) ([]string, error) {
@@ -26,7 +26,7 @@ func normalizeProjectTypeFilter(values []string) ([]string, error) {
 	return out, nil
 }
 
-func (c *JiraRESTClient) ListProjectsViaREST(ctx context.Context, cloudID string, projectTypes []string, pageSize int) ([]canonical.CanonicalProjectWithOpsgenieTeams, error) {
+func (c *JiraRESTClient) ListProjectsViaREST(ctx context.Context, cloudID string, projectTypes []string, pageSize int) ([]atlassian.CanonicalProjectWithOpsgenieTeams, error) {
 	cloud := strings.TrimSpace(cloudID)
 	if cloud == "" {
 		return nil, errors.New("cloudID is required")
@@ -46,7 +46,7 @@ func (c *JiraRESTClient) ListProjectsViaREST(ctx context.Context, cloudID string
 
 	startAt := 0
 	seenStart := map[int]struct{}{}
-	var out []canonical.CanonicalProjectWithOpsgenieTeams
+	var out []atlassian.CanonicalProjectWithOpsgenieTeams
 
 	for {
 		if _, ok := seenStart[startAt]; ok {
@@ -78,9 +78,9 @@ func (c *JiraRESTClient) ListProjectsViaREST(ctx context.Context, cloudID string
 			if _, ok := typeSet[strings.TrimSpace(*project.Type)]; !ok {
 				continue
 			}
-			out = append(out, canonical.CanonicalProjectWithOpsgenieTeams{
+			out = append(out, atlassian.CanonicalProjectWithOpsgenieTeams{
 				Project:       project,
-				OpsgenieTeams: []canonical.OpsgenieTeamRef{},
+				OpsgenieTeams: []atlassian.OpsgenieTeamRef{},
 			})
 		}
 

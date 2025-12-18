@@ -62,7 +62,8 @@ Represent the Atlassian GraphQL Gateway schema as it exists *today*.
 
 * `python/atlassian/graph/gen/`
 * `python/atlassian/rest/gen/`
-* `go/graphql/gen/`
+* `go/atlassian/graph/gen/`
+* `go/atlassian/rest/gen/`
 * Source schema: `graphql/schema.introspection.json`
 
 **Rules:**
@@ -91,7 +92,8 @@ Safely execute GraphQL operations against AGG.
 
 * `python/atlassian/graph/client.py`
 * `python/atlassian/rest/client.py`
-* `go/graphql/client.go`
+* `go/atlassian/graph/client.go`
+* `go/atlassian/rest/client.go`
 
 **Hard Rules:**
 
@@ -146,7 +148,8 @@ Convert API models → canonical analytics models.
 
 * `python/atlassian/graph/mappers/`
 * `python/atlassian/rest/mappers/`
-* `go/graphql/mappers/`
+* `go/atlassian/graph/mappers/`
+* `go/atlassian/rest/mappers/`
 
 **Rules:**
 

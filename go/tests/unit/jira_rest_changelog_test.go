@@ -6,11 +6,11 @@ import (
 	"strconv"
 	"testing"
 
-	"atlassian-graphql/graphql"
+	"atlassian-graphql/atlassian/rest"
 )
 
 func TestJiraRESTChangelogPaginationAndMapping(t *testing.T) {
-	client := graphql.JiraRESTClient{
+	client := rest.JiraRESTClient{
 		BaseURL: "http://example",
 		Auth:    noAuth{},
 		HTTPClient: newHTTPClient(func(req *http.Request) *http.Response {

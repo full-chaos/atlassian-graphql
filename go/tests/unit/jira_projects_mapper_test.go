@@ -3,8 +3,8 @@ package unit
 import (
 	"testing"
 
-	"atlassian-graphql/graphql/gen"
-	"atlassian-graphql/graphql/mappers"
+	"atlassian-graphql/atlassian/graph/gen"
+	"atlassian-graphql/atlassian/graph/mappers"
 )
 
 func TestJiraProjectsMapperTrimsAndDedups(t *testing.T) {
@@ -33,4 +33,3 @@ func TestJiraProjectsMapperRequiresFields(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
-

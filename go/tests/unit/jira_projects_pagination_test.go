@@ -6,14 +6,14 @@ import (
 	"net/http"
 	"testing"
 
-	"atlassian-graphql/graphql"
-	"atlassian-graphql/graphql/gen"
+	"atlassian-graphql/atlassian/graph"
+	"atlassian-graphql/atlassian/graph/gen"
 )
 
 func TestJiraProjectsPaginationOuterAndNested(t *testing.T) {
 	var calls []string
 
-	client := graphql.Client{
+	client := graph.Client{
 		BaseURL: "http://example",
 		Auth:    noAuth{},
 		HTTPClient: newHTTPClient(func(req *http.Request) *http.Response {
@@ -175,4 +175,3 @@ func TestJiraProjectsPaginationOuterAndNested(t *testing.T) {
 		}
 	}
 }
-

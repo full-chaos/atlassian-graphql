@@ -1,4 +1,4 @@
-package canonical
+package atlassian
 
 type JiraUser struct {
 	AccountID   string  `json:"accountId"`
@@ -74,4 +74,3 @@ type CanonicalProjectWithOpsgenieTeams struct {
 	Project       JiraProject       `json:"project"`
 	OpsgenieTeams []OpsgenieTeamRef `json:"opsgenieTeams"`
 }
-

@@ -1,9 +1,11 @@
-package graphql
+package graph
 
 import (
 	"math"
 	"sync"
 	"time"
+
+	"atlassian-graphql/atlassian"
 )
 
 type tokenBucket struct {
@@ -64,7 +66,7 @@ func (b *tokenBucket) consume(cost float64, maxWait time.Duration) (time.Duratio
 
 		remaining := deadline.Sub(b.now())
 		if remaining <= 0 || lastWait <= 0 {
-			return waited, &LocalRateLimitError{
+			return waited, &atlassian.LocalRateLimitError{
 				EstimatedCost:  cost,
 				WaitSeconds:    lastWait.Seconds(),
 				MaxWaitSeconds: maxWait.Seconds(),
@@ -75,7 +77,7 @@ func (b *tokenBucket) consume(cost float64, maxWait time.Duration) (time.Duratio
 			sleepFor = remaining
 		}
 		if sleepFor <= 0 {
-			return waited, &LocalRateLimitError{
+			return waited, &atlassian.LocalRateLimitError{
 				EstimatedCost:  cost,
 				WaitSeconds:    lastWait.Seconds(),
 				MaxWaitSeconds: maxWait.Seconds(),

@@ -7,13 +7,13 @@ import (
 	"testing"
 	"time"
 
-	"atlassian-graphql/graphql"
+	"atlassian-graphql/atlassian/rest"
 )
 
 func TestJiraRESTProjectsPaginationAndFiltering(t *testing.T) {
 	var calls []int
 
-	client := graphql.JiraRESTClient{
+	client := rest.JiraRESTClient{
 		BaseURL: "http://example",
 		Auth:    noAuth{},
 		HTTPClient: newHTTPClient(func(req *http.Request) *http.Response {
@@ -88,7 +88,7 @@ func TestJiraRESTClientRetriesOn429RetryAfterSeconds(t *testing.T) {
 	}
 
 	call := 0
-	client := graphql.JiraRESTClient{
+	client := rest.JiraRESTClient{
 		BaseURL:       "http://example",
 		Auth:          noAuth{},
 		MaxRetries429: 1,

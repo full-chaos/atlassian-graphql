@@ -205,4 +205,3 @@ func DecodeProjectOpsgenieTeams(data map[string]any) (*OpsgenieTeamsConnection, 
 	teams := out.Jira.Project.OpsgenieTeams
 	return &teams, nil
 }
-

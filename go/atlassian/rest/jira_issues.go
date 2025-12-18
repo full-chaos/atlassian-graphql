@@ -1,4 +1,4 @@
-package graphql
+package rest
 
 import (
 	"context"
@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"atlassian-graphql/graphql/canonical"
-	"atlassian-graphql/graphql/gen"
-	"atlassian-graphql/graphql/mappers"
+	"atlassian-graphql/atlassian"
+	"atlassian-graphql/atlassian/rest/gen"
+	"atlassian-graphql/atlassian/rest/mappers"
 )
 
 var defaultJiraSearchFields = []string{
@@ -25,7 +25,7 @@ var defaultJiraSearchFields = []string{
 	"components",
 }
 
-func (c *JiraRESTClient) ListIssuesViaREST(ctx context.Context, cloudID string, jql string, pageSize int) ([]canonical.JiraIssue, error) {
+func (c *JiraRESTClient) ListIssuesViaREST(ctx context.Context, cloudID string, jql string, pageSize int) ([]atlassian.JiraIssue, error) {
 	cloud := strings.TrimSpace(cloudID)
 	if cloud == "" {
 		return nil, errors.New("cloudID is required")
@@ -41,7 +41,7 @@ func (c *JiraRESTClient) ListIssuesViaREST(ctx context.Context, cloudID string, 
 	fields := strings.Join(defaultJiraSearchFields, ",")
 	startAt := 0
 	seenStart := map[int]struct{}{}
-	var out []canonical.JiraIssue
+	var out []atlassian.JiraIssue
 
 	for {
 		if _, ok := seenStart[startAt]; ok {
